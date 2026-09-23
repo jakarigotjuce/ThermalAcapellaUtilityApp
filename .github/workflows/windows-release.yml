@@ -1,0 +1,48 @@
+name: Build Windows EXE release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version (example 1.0.0)
+        required: true
+        default: '1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
+      - name: Install Inno Setup 6
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+      - name: Build and test Windows executables
+        shell: pwsh
+        run: .\Build-Windows.ps1 -Version '${{ inputs.version }}'
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AcapellaDownloader-Windows
+          path: |
+            release/AcapellaDownloaderSetup.exe
+            release/AcapellaDownloader-Windows-Portable.zip
+          if-no-files-found: error
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        shell: pwsh
+        run: |
+          gh release create "v$env:RELEASE_VERSION" `
+            "release/AcapellaDownloaderSetup.exe" `
+            "release/AcapellaDownloader-Windows-Portable.zip" `
+            --title "Acapella Downloader v$env:RELEASE_VERSION" `
+            --notes-file RELEASE_NOTES.md
