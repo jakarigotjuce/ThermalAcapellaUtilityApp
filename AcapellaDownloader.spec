@@ -21,7 +21,8 @@ worker_analysis = Analysis(
     binaries=[(str(TOOLS / name), 'tools') for name in required],
     datas=collect_data_files('demucs') + collect_data_files('librosa'),
     hiddenimports=collect_submodules('demucs', on_error='ignore')
-                 + collect_submodules('yt_dlp.extractor', on_error='ignore'),
+                + collect_submodules('yt_dlp.extractor', on_error='ignore')
+                + ['pyexpat', 'xml.parsers.expat'],
     hookspath=[], hooksconfig={}, runtime_hooks=[], excludes=[], noarchive=False,
 )
 # Share native libraries and other dependencies rather than bundling Torch twice.
