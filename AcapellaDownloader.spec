@@ -25,10 +25,6 @@ worker_analysis = Analysis(
                 + ['pyexpat', 'xml.parsers.expat'],
     hookspath=[], hooksconfig={}, runtime_hooks=[], excludes=[], noarchive=False,
 )
-# Share native libraries and other dependencies rather than bundling Torch twice.
-MERGE((app_analysis, 'app', 'AcapellaDownloader'),
-      (worker_analysis, 'worker', 'AcapellaWorker'))
-
 app_pyz = PYZ(app_analysis.pure)
 app_exe = EXE(
     app_pyz, app_analysis.scripts, app_analysis.dependencies,
